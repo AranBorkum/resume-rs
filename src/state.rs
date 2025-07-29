@@ -1,26 +1,30 @@
+use std::env;
+
 use crate::{
-    employment::{Education, Employment, EmploymentEducation, KRAKEN, MPB, SOCIUS, UOS_MPHYS, UOS_PHD},
+    employment::{Education, Employment, EmploymentEducation},
     ui::tabs::TabsHeadings,
 };
 
-pub struct State<'a> {
+pub struct State {
     pub selected_tab: TabsHeadings,
     pub selected_employment_entry: usize,
-    pub employment_history: Vec<Employment<'a>>,
+    pub employment_history: Vec<Employment>,
     pub selected_education_entry: usize,
-    pub education_history: Vec<Education<'a>>,
+    pub education_history: Vec<Education>,
     pub employment_or_education: EmploymentEducation,
+    pub about_me_scroll_offset: u16,
 }
 
-impl State<'_> {
+impl State {
     pub fn default() -> Self {
         Self {
             selected_tab: TabsHeadings::AboutMe,
             selected_employment_entry: 0,
-            employment_history: vec![KRAKEN, MPB, SOCIUS],
+            employment_history: Vec::new(),
             selected_education_entry: 0,
-            education_history: vec![UOS_PHD, UOS_MPHYS],
+            education_history: Vec::new(),
             employment_or_education: EmploymentEducation::Employment,
+            about_me_scroll_offset: 0,
         }
     }
 
@@ -58,6 +62,34 @@ impl State<'_> {
             EmploymentEducation::Education => EmploymentEducation::Employment,
         }
     }
+
+    pub fn load_employment_from_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let cwd = env::current_dir()?;
+        let file_path = cwd.join("data/employment.json");
+        let json_data = std::fs::read_to_string(file_path)?;
+        let employment: Vec<Employment> = serde_json::from_str(&json_data)?;
+        self.employment_history = employment;
+        Ok(())
+    }
+
+    pub fn load_education_from_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let cwd = env::current_dir()?;
+        let file_path = cwd.join("data/education.json");
+        let json_data = std::fs::read_to_string(file_path)?;
+        let education: Vec<Education> = serde_json::from_str(&json_data)?;
+        self.education_history = education;
+        Ok(())
+    }
+
+    pub fn scroll_about_me_down(&mut self) {
+        self.about_me_scroll_offset = self.about_me_scroll_offset + 1;
+    }
+
+    pub fn scroll_about_me_up(&mut self) {
+        if self.about_me_scroll_offset > 0 {
+            self.about_me_scroll_offset = self.about_me_scroll_offset - 1;
+        }
+    }
 }
 
 #[cfg(test)]
@@ -82,7 +114,15 @@ mod tests {
 
     #[test]
     fn test_next_employer() {
-        let mut state = State::default();
+        let mut state = State {
+            selected_tab: TabsHeadings::AboutMe,
+            selected_employment_entry: 0,
+            employment_history: vec![Employment::_default(), Employment::_default()],
+            employment_or_education: EmploymentEducation::Employment,
+            selected_education_entry: 1,
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
+        };
         assert_eq!(state.selected_employment_entry, 0);
         state.next_employer();
         assert_eq!(state.selected_employment_entry, 1);
@@ -90,7 +130,15 @@ mod tests {
 
     #[test]
     fn test_previous_employer() {
-        let mut state = State::default();
+        let mut state = State {
+            selected_tab: TabsHeadings::AboutMe,
+            selected_employment_entry: 0,
+            employment_history: vec![Employment::_default(), Employment::_default()],
+            employment_or_education: EmploymentEducation::Employment,
+            selected_education_entry: 1,
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
+        };
         assert_eq!(state.selected_employment_entry, 0);
         state.next_employer();
         assert_eq!(state.selected_employment_entry, 1);
@@ -103,10 +151,11 @@ mod tests {
         let mut state = State {
             selected_tab: TabsHeadings::AboutMe,
             selected_employment_entry: 1,
-            employment_history: vec![KRAKEN, MPB],
+            employment_history: vec![Employment::_default(), Employment::_default()],
             employment_or_education: EmploymentEducation::Employment,
             selected_education_entry: 1,
-            education_history: vec![UOS_PHD, UOS_MPHYS],
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
         };
         assert_eq!(state.selected_employment_entry, 1);
         state.next_employer();
@@ -118,10 +167,11 @@ mod tests {
         let mut state = State {
             selected_tab: TabsHeadings::AboutMe,
             selected_employment_entry: 1,
-            employment_history: vec![KRAKEN, MPB],
+            employment_history: vec![Employment::_default(), Employment::_default()],
             employment_or_education: EmploymentEducation::Employment,
             selected_education_entry: 1,
-            education_history: vec![UOS_PHD, UOS_MPHYS],
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
         };
         assert_eq!(state.selected_employment_entry, 1);
         state.next_employer();
@@ -140,7 +190,15 @@ mod tests {
 
     #[test]
     fn test_next_educator() {
-        let mut state = State::default();
+        let mut state = State {
+            selected_tab: TabsHeadings::AboutMe,
+            selected_employment_entry: 1,
+            employment_history: vec![Employment::_default(), Employment::_default()],
+            employment_or_education: EmploymentEducation::Employment,
+            selected_education_entry: 0,
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
+        };
         assert_eq!(state.selected_education_entry, 0);
         state.next_educator();
         assert_eq!(state.selected_education_entry, 1);
@@ -148,7 +206,15 @@ mod tests {
 
     #[test]
     fn test_previous_educator() {
-        let mut state = State::default();
+        let mut state = State {
+            selected_tab: TabsHeadings::AboutMe,
+            selected_employment_entry: 1,
+            employment_history: vec![Employment::_default(), Employment::_default()],
+            employment_or_education: EmploymentEducation::Employment,
+            selected_education_entry: 0,
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
+        };
         assert_eq!(state.selected_education_entry, 0);
         state.next_educator();
         assert_eq!(state.selected_education_entry, 1);
@@ -161,10 +227,11 @@ mod tests {
         let mut state = State {
             selected_tab: TabsHeadings::AboutMe,
             selected_employment_entry: 1,
-            employment_history: vec![KRAKEN, MPB],
+            employment_history: vec![Employment::_default(), Employment::_default()],
             employment_or_education: EmploymentEducation::Employment,
             selected_education_entry: 1,
-            education_history: vec![UOS_PHD, UOS_MPHYS],
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
         };
         assert_eq!(state.selected_education_entry, 1);
         state.next_educator();
@@ -176,10 +243,11 @@ mod tests {
         let mut state = State {
             selected_tab: TabsHeadings::AboutMe,
             selected_employment_entry: 1,
-            employment_history: vec![KRAKEN, MPB],
+            employment_history: vec![Employment::_default(), Employment::_default()],
             employment_or_education: EmploymentEducation::Employment,
             selected_education_entry: 1,
-            education_history: vec![UOS_PHD, UOS_MPHYS],
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 0,
         };
         assert_eq!(state.selected_education_entry, 1);
         state.next_educator();
@@ -205,5 +273,37 @@ mod tests {
             state.employment_or_education,
             EmploymentEducation::Employment
         );
+    }
+
+    #[test]
+    fn test_scroll_about_me_down() {
+        let mut state = State::default();
+        assert_eq!(state.about_me_scroll_offset, 0);
+        state.scroll_about_me_down();
+        assert_eq!(state.about_me_scroll_offset, 1);
+    }
+
+    #[test]
+    fn test_scroll_about_me_up() {
+        let mut state = State {
+            selected_tab: TabsHeadings::AboutMe,
+            selected_employment_entry: 1,
+            employment_history: vec![Employment::_default(), Employment::_default()],
+            employment_or_education: EmploymentEducation::Employment,
+            selected_education_entry: 1,
+            education_history: vec![Education::_default(), Education::_default()],
+            about_me_scroll_offset: 1,
+        };
+        assert_eq!(state.about_me_scroll_offset, 1);
+        state.scroll_about_me_up();
+        assert_eq!(state.about_me_scroll_offset, 0);
+    }
+
+    #[test]
+    fn test_scroll_about_me_up_does_not_underflow() {
+        let mut state = State::default();
+        assert_eq!(state.about_me_scroll_offset, 0);
+        state.scroll_about_me_up();
+        assert_eq!(state.about_me_scroll_offset, 0);
     }
 }

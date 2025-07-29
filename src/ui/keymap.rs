@@ -44,6 +44,10 @@ pub fn render_keymap<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
                 base_events.push(Event::PreviousEducation);
             }
         },
+        TabsHeadings::AboutMe => {
+            base_events.push(Event::ScrollAboutMeTextDown);
+            base_events.push(Event::ScrollAboutMeTextUp);
+        }
         _ => {}
     }
 

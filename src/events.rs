@@ -11,6 +11,10 @@ pub enum Event {
     PreviousEducation,
     SelectEducation,
     SelectEmployment,
+
+    ScrollAboutMeTextDown,
+    ScrollAboutMeTextUp,
+
 }
 
 impl Event {
@@ -26,6 +30,8 @@ impl Event {
             Self::PreviousEducation => "previous education",
             Self::SelectEducation => "select education",
             Self::SelectEmployment => "select employment",
+            Self::ScrollAboutMeTextDown => "scroll down",
+            Self::ScrollAboutMeTextUp => "scroll up",
         }
     }
 
@@ -35,12 +41,14 @@ impl Event {
             Self::SwitchToAboutMe => "a",
             Self::SwitchToContactInformation => "c",
             Self::SwitchToEmployment => "e",
-            Self::NextEmployer => "C-n",
-            Self::PreviousEmployer => "C-p",
-            Self::NextEducation => "C-n",
-            Self::PreviousEducation => "C-p",
+            Self::NextEmployer => "j",
+            Self::PreviousEmployer => "k",
+            Self::NextEducation => "j",
+            Self::PreviousEducation => "k",
             Self::SelectEducation => "C-o",
             Self::SelectEmployment => "C-o",
+            Self::ScrollAboutMeTextDown => "C-n",
+            Self::ScrollAboutMeTextUp => "C-p",
         }
     }
 }

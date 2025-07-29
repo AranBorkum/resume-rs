@@ -11,9 +11,17 @@ use tui::{
 };
 
 use crate::{
-    keymap::global_key_map, settings::Settings, state::State, ui::{
-        about_me::render_about_me, banner::render_banner, contact_details::render_contact_details, employment::render_employment, keymap::render_keymap, tabs::{render_tabs, TabsHeadings}
-    }
+    keymap::global_key_map,
+    settings::Settings,
+    state::State,
+    ui::{
+        about_me::render_about_me,
+        banner::render_banner,
+        contact_details::render_contact_details,
+        employment::render_employment,
+        keymap::render_keymap,
+        tabs::{render_tabs, TabsHeadings},
+    },
 };
 
 mod assets;
@@ -23,7 +31,6 @@ mod keymap;
 mod settings;
 mod state;
 mod ui;
-
 
 fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
@@ -51,6 +58,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 fn run_app<B: tui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
     let mut state = State::default();
+    let _ = state.load_employment_from_file();
+    let _ = state.load_education_from_file();
     let settings = Settings::default();
     loop {
         terminal.draw(|f| {
@@ -70,7 +79,7 @@ fn run_app<B: tui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Result<(
             render_tabs(f, chunks[1], state.selected_tab.index());
 
             match state.selected_tab {
-                TabsHeadings::AboutMe => render_about_me(f, chunks[2]),
+                TabsHeadings::AboutMe => render_about_me(f, chunks[2], &state),
                 TabsHeadings::ContactDetails => render_contact_details(f, chunks[2]),
                 TabsHeadings::EmploymentAndEducation => render_employment(f, chunks[2], &state),
             }

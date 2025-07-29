@@ -1,18 +1,22 @@
-pub struct Employment<'a> {
-    pub employer: &'a str,
-    pub role: &'a str,
-    pub start_date: &'a str,
-    pub end_date: &'a str,
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Employment {
+    pub employer: String,
+    pub role: String,
+    pub start_date: String,
+    pub end_date: String,
 }
 
-pub struct Education<'a> {
-    pub educator: &'a str,
-    pub qualification: &'a str,
-    pub start_date: &'a str,
-    pub end_date: &'a str,
+#[derive(Debug, Deserialize)]
+pub struct Education {
+    pub educator: String,
+    pub qualification: String,
+    pub start_date: String,
+    pub end_date: String,
 }
 
-impl Employment<'_> {
+impl Employment {
     pub fn representation(&self, selected: bool) -> String {
         let prefix = match selected {
             true => " * ",
@@ -23,9 +27,18 @@ impl Employment<'_> {
             self.employer, prefix, self.role, self.start_date, self.end_date
         )
     }
+
+    pub fn _default() -> Self {
+        Self {
+            employer: String::from("default"),
+            role: String::from("role"),
+            start_date: String::from("start date"),
+            end_date: String::from("end date"),
+        }
+    }
 }
 
-impl Education<'_> {
+impl Education {
     pub fn representation(&self, selected: bool) -> String {
         let prefix = match selected {
             true => " * ",
@@ -36,6 +49,15 @@ impl Education<'_> {
             self.educator, prefix, self.qualification, self.start_date, self.end_date
         )
     }
+
+    pub fn _default() -> Self {
+        Self {
+            educator: String::from("default"),
+            qualification: String::from("qualification"),
+            start_date: String::from("start date"),
+            end_date: String::from("end date"),
+        }
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -43,35 +65,3 @@ pub enum EmploymentEducation {
     Employment,
     Education,
 }
-
-pub const KRAKEN: Employment = Employment {
-    employer: "Kraken",
-    role: "Software Engineer II",
-    start_date: "Dec 2024",
-    end_date: "Present",
-};
-pub const MPB: Employment = Employment {
-    employer: "MPB.com",
-    role: "Software Engineer",
-    start_date: "Apr 2023",
-    end_date: "Dec 2024",
-};
-pub const SOCIUS: Employment = Employment {
-    employer: "Socius Ventures",
-    role: "Software Engineer",
-    start_date: "Oct 2022",
-    end_date: "Apr 2023",
-};
-
-pub const UOS_PHD: Education = Education {
-    educator: "University of Sussex",
-    qualification: "Ph.D Physics",
-    start_date: "Sep 2018",
-    end_date: "Dec 2022",
-};
-pub const UOS_MPHYS: Education = Education {
-    educator: "University of Sussex",
-    qualification: "MPhys Physics",
-    start_date: "Sep 2014",
-    end_date: "July 2018",
-};

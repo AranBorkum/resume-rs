@@ -1,9 +1,9 @@
 use tui::{
-    Frame,
     backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
     widgets::{Block, Borders, Paragraph},
+    Frame,
 };
 
 pub fn render_contact_details<B: Backend>(f: &mut Frame<B>, chunk: Rect) {

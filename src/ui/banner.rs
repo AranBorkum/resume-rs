@@ -1,9 +1,9 @@
 use tui::{
-    Frame,
     backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
     widgets::{Block, Borders, Paragraph},
+    Frame,
 };
 
 use crate::assets::banner;

@@ -14,7 +14,6 @@ pub enum Event {
 
     ScrollAboutMeTextDown,
     ScrollAboutMeTextUp,
-
 }
 
 impl Event {

@@ -1,4 +1,7 @@
-use std::env;
+use std::{
+    env,
+    time::{Duration, Instant},
+};
 
 use crate::{
     employment::{Education, Employment, EmploymentEducation},
@@ -13,6 +16,9 @@ pub struct State {
     pub education_history: Vec<Education>,
     pub employment_or_education: EmploymentEducation,
     pub about_me_scroll_offset: u16,
+    last_tick: Instant,
+    pub dot_count: u8,
+    pub is_loading: bool,
 }
 
 impl State {
@@ -25,6 +31,9 @@ impl State {
             education_history: Vec::new(),
             employment_or_education: EmploymentEducation::Employment,
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         }
     }
 
@@ -90,6 +99,13 @@ impl State {
             self.about_me_scroll_offset = self.about_me_scroll_offset - 1;
         }
     }
+
+    pub fn update_dot_count(&mut self) {
+        if self.last_tick.elapsed() >= Duration::from_millis(500) {
+            self.dot_count = (self.dot_count + 1) % 4; // 0, 1, 2, 3 (will show up to 3 dots)
+            self.last_tick = Instant::now();
+        }
+    }
 }
 
 #[cfg(test)]
@@ -122,6 +138,9 @@ mod tests {
             selected_education_entry: 1,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_employment_entry, 0);
         state.next_employer();
@@ -138,6 +157,9 @@ mod tests {
             selected_education_entry: 1,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_employment_entry, 0);
         state.next_employer();
@@ -156,6 +178,9 @@ mod tests {
             selected_education_entry: 1,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_employment_entry, 1);
         state.next_employer();
@@ -172,6 +197,9 @@ mod tests {
             selected_education_entry: 1,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_employment_entry, 1);
         state.next_employer();
@@ -198,6 +226,9 @@ mod tests {
             selected_education_entry: 0,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_education_entry, 0);
         state.next_educator();
@@ -214,6 +245,9 @@ mod tests {
             selected_education_entry: 0,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_education_entry, 0);
         state.next_educator();
@@ -232,6 +266,9 @@ mod tests {
             selected_education_entry: 1,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_education_entry, 1);
         state.next_educator();
@@ -248,6 +285,9 @@ mod tests {
             selected_education_entry: 1,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 0,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.selected_education_entry, 1);
         state.next_educator();
@@ -293,6 +333,9 @@ mod tests {
             selected_education_entry: 1,
             education_history: vec![Education::_default(), Education::_default()],
             about_me_scroll_offset: 1,
+            last_tick: Instant::now(),
+            dot_count: 1,
+            is_loading: false,
         };
         assert_eq!(state.about_me_scroll_offset, 1);
         state.scroll_about_me_up();

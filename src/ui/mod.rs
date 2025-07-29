@@ -3,4 +3,5 @@ pub mod banner;
 pub mod contact_details;
 pub mod employment;
 pub mod keymap;
+pub mod loading;
 pub mod tabs;

@@ -34,8 +34,7 @@ fn employment_block<'a>(list_state: &mut ListState, state: &State) -> List<'a> {
         );
     }
 
-    let mut list = List::new(employment_list_items)
-        .block(block);
+    let mut list = List::new(employment_list_items).block(block);
 
     if state.employment_or_education == EmploymentEducation::Employment {
         list = list.highlight_style(Style::default().add_modifier(Modifier::BOLD));
@@ -70,8 +69,7 @@ fn education_block<'a>(list_state: &mut ListState, state: &State) -> List<'a> {
         );
     }
 
-    let mut list = List::new(education_list_items)
-        .block(block);
+    let mut list = List::new(education_list_items).block(block);
 
     if state.employment_or_education == EmploymentEducation::Education {
         list = list.highlight_style(Style::default().add_modifier(Modifier::BOLD));

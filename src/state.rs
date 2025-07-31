@@ -170,6 +170,10 @@ impl State {
             self.last_tick = Instant::now();
         }
     }
+
+    pub fn get_employment_entry(&self) -> &Employment {
+        &self.employment_history[self.selected_employment_entry]
+    }
 }
 
 #[cfg(test)]

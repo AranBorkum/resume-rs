@@ -174,6 +174,10 @@ impl State {
     pub fn get_employment_entry(&self) -> &Employment {
         &self.employment_history[self.selected_employment_entry]
     }
+
+    pub fn get_education_entry(&self) -> &Education {
+        &self.education_history[self.selected_education_entry]
+    }
 }
 
 #[cfg(test)]

@@ -79,6 +79,13 @@ fn education_block<'a>(list_state: &mut ListState, state: &State) -> List<'a> {
 }
 
 fn description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+    match state.employment_or_education {
+        EmploymentEducation::Employment => employment_description_block(f, chunk, state),
+        EmploymentEducation::Education => education_description_block(f, chunk, state),
+    }
+}
+
+fn employment_description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
     let description_section = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -128,6 +135,45 @@ fn description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &Stat
     f.render_widget(title, description_section[0]);
     f.render_widget(details, description_section[1]);
     f.render_widget(software, description_section[2]);
+}
+
+fn education_description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+    let description_section = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Length(4),
+            Constraint::Min(0),
+            Constraint::Length(6),
+        ])
+        .split(chunk);
+
+    let education_entry = state.get_education_entry();
+
+    let title_text = format!(
+        "{}\n{}\n{} - {}",
+        education_entry.educator,
+        education_entry.qualification,
+        education_entry.start_date,
+        education_entry.end_date
+    );
+
+    let title = Paragraph::new(title_text)
+        .style(
+            Style::default()
+                .fg(Color::Green)
+                .add_modifier(Modifier::BOLD),
+        )
+        .alignment(Alignment::Left)
+        .block(Block::default().borders(Borders::NONE));
+
+    let details = Paragraph::new(education_entry.description.clone())
+        .style(Style::default().add_modifier(Modifier::BOLD))
+        .wrap(Wrap { trim: true })
+        .alignment(Alignment::Left)
+        .block(Block::default().borders(Borders::NONE));
+
+    f.render_widget(title, description_section[0]);
+    f.render_widget(details, description_section[1]);
 }
 
 pub fn render_employment<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {

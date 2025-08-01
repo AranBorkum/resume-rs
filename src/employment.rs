@@ -33,6 +33,7 @@ pub struct Education {
     pub qualification: String,
     pub start_date: String,
     pub end_date: String,
+    pub description: String,
 }
 
 impl Employment {
@@ -77,6 +78,7 @@ impl Education {
             qualification: String::from("qualification"),
             start_date: String::from("start date"),
             end_date: String::from("end date"),
+            description: String::from("description"),
         }
     }
 }

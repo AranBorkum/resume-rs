@@ -1,3 +1,4 @@
+use clap::Parser;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture},
     execute,
@@ -33,15 +34,24 @@ mod settings;
 mod state;
 mod ui;
 
+#[derive(Parser, Debug)]
+#[command(name = "my-app")]
+struct Cli {
+    #[arg(short, long, default_value_t = false)]
+    local: bool,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    let cli = Cli::parse();
+
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let res = run_app(&mut terminal).await;
+    let res = run_app(&mut terminal, cli.local).await;
 
     disable_raw_mode()?;
     execute!(
@@ -58,14 +68,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn run_app<B: tui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+async fn run_app<B: tui::backend::Backend>(
+    terminal: &mut Terminal<B>,
+    local: bool,
+) -> io::Result<()> {
     let mut state = State::default();
     let settings = Settings::default();
-    // let _ = state.load_employment_from_file();
-    // let _ = state._load_education_from_file(&settings);
-    let _ = state.load_employment_file_from_s3(&settings).await;
-    let _ = state.load_education_file_from_s3(&settings).await;
-    let settings = Settings::default();
+    let _ = state.load_files(&settings, local).await;
+
     loop {
         terminal.draw(|f| match state.is_loading {
             true => {

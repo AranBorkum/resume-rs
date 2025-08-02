@@ -1,11 +1,30 @@
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone)]
+pub struct Software {
+    pub backend: String,
+    pub frontend: String,
+    pub infrastructure: String,
+}
+
+impl Software {
+    pub fn _default() -> Self {
+        Self {
+            backend: String::from(""),
+            frontend: String::from(""),
+            infrastructure: String::from(""),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct Employment {
     pub employer: String,
     pub role: String,
     pub start_date: String,
     pub end_date: String,
+    pub description: String,
+    pub software: Software,
 }
 
 #[derive(Debug, Deserialize)]
@@ -14,6 +33,7 @@ pub struct Education {
     pub qualification: String,
     pub start_date: String,
     pub end_date: String,
+    pub description: String,
 }
 
 impl Employment {
@@ -34,6 +54,8 @@ impl Employment {
             role: String::from("role"),
             start_date: String::from("start date"),
             end_date: String::from("end date"),
+            description: String::from("description"),
+            software: Software::_default(),
         }
     }
 }
@@ -56,6 +78,7 @@ impl Education {
             qualification: String::from("qualification"),
             start_date: String::from("start date"),
             end_date: String::from("end date"),
+            description: String::from("description"),
         }
     }
 }

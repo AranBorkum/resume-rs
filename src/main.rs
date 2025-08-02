@@ -33,14 +33,15 @@ mod settings;
 mod state;
 mod ui;
 
-fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let res = run_app(&mut terminal);
+    let res = run_app(&mut terminal).await;
 
     disable_raw_mode()?;
     execute!(
@@ -57,10 +58,13 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn run_app<B: tui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+async fn run_app<B: tui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
     let mut state = State::default();
-    let _ = state.load_employment_from_file();
-    let _ = state.load_education_from_file();
+    let settings = Settings::default();
+    // let _ = state.load_employment_from_file();
+    // let _ = state._load_education_from_file(&settings);
+    let _ = state.load_employment_file_from_s3(&settings).await;
+    let _ = state.load_education_file_from_s3(&settings).await;
     let settings = Settings::default();
     loop {
         terminal.draw(|f| match state.is_loading {

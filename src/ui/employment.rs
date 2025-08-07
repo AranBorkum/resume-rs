@@ -1,4 +1,4 @@
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
@@ -78,14 +78,14 @@ fn education_block<'a>(list_state: &mut ListState, state: &State) -> List<'a> {
     list
 }
 
-fn description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+fn description_block<'a, B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     match state.employment_or_education {
-        EmploymentEducation::Employment => employment_description_block(f, chunk, state),
-        EmploymentEducation::Education => education_description_block(f, chunk, state),
+        EmploymentEducation::Employment => employment_description_block::<B>(f, chunk, state),
+        EmploymentEducation::Education => education_description_block::<B>(f, chunk, state),
     }
 }
 
-fn employment_description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+fn employment_description_block<'a, B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     let description_section = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -137,7 +137,7 @@ fn employment_description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, s
     f.render_widget(software, description_section[2]);
 }
 
-fn education_description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+fn education_description_block<'a, B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     let description_section = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -176,7 +176,7 @@ fn education_description_block<'a, B: Backend>(f: &mut Frame<B>, chunk: Rect, st
     f.render_widget(details, description_section[1]);
 }
 
-pub fn render_employment<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+pub fn render_employment<B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     let top_bottom = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Length(3), Constraint::Min(0)])
@@ -214,5 +214,5 @@ pub fn render_employment<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &Stat
     f.render_widget(title, top_bottom[0]);
     f.render_stateful_widget(employment_list, list_chuncks[0], &mut employment_list_state);
     f.render_stateful_widget(education_list, list_chuncks[1], &mut education_list_state);
-    description_block(f, bottom_chunks[2], state);
+    description_block::<B>(f, bottom_chunks[2], state);
 }

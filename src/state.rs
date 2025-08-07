@@ -3,7 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use aws_config::{BehaviorVersion, Region};
+use aws_config::{load_defaults, BehaviorVersion, Region};
 use aws_sdk_s3::Client;
 
 use crate::{
@@ -76,7 +76,20 @@ impl State {
         }
     }
 
-    pub fn _load_employment_from_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn load_files(&mut self, settings: &Settings, local: bool) {
+        match local {
+            true => {
+                let _ = self.load_employment_from_file();
+                let _ = self.load_education_from_file();
+            }
+            false => {
+                let _ = self.load_employment_file_from_s3(&settings).await;
+                let _ = self.load_education_file_from_s3(&settings).await;
+            }
+        }
+    }
+
+    fn load_employment_from_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let cwd = env::current_dir()?;
         let file_path = cwd.join("data/employment.json");
         let json_data = std::fs::read_to_string(file_path)?;
@@ -85,7 +98,7 @@ impl State {
         Ok(())
     }
 
-    pub fn _load_education_from_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    fn load_education_from_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let cwd = env::current_dir()?;
         let file_path = cwd.join("data/education.json");
         let json_data = std::fs::read_to_string(file_path)?;
@@ -94,14 +107,15 @@ impl State {
         Ok(())
     }
 
-    pub async fn load_employment_file_from_s3(
+    async fn load_employment_file_from_s3(
         &mut self,
         settings: &Settings,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let key = "employment.json";
 
-        let config_loader = aws_config::defaults(BehaviorVersion::latest());
-        let config = config_loader.region(Region::new("eu-west-2")).load().await;
+        //let config_loader = aws_config::defaults(BehaviorVersion::latest());
+        //let config = config_loader.region(Region::new("eu-west-2")).load().await;
+        let config = load_defaults(BehaviorVersion::latest()).await;
 
         let client = Client::new(&config);
 
@@ -124,7 +138,7 @@ impl State {
         Ok(())
     }
 
-    pub async fn load_education_file_from_s3(
+    async fn load_education_file_from_s3(
         &mut self,
         settings: &Settings,
     ) -> Result<(), Box<dyn std::error::Error>> {

@@ -1,8 +1,8 @@
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::Rect,
     style::{Color, Modifier, Style},
-    text::{Span, Spans},
+    text::Span,
     widgets::{Block, Tabs},
     Frame,
 };
@@ -32,14 +32,14 @@ impl TabsHeadings {
     }
 }
 
-pub fn render_tabs<B: Backend>(f: &mut Frame<B>, chunk: Rect, selected: usize) {
+pub fn render_tabs<B: Backend>(f: &mut Frame, chunk: Rect, selected: usize) {
     let titles = [
         TabsHeadings::AboutMe.title(),
         TabsHeadings::ContactDetails.title(),
         TabsHeadings::EmploymentAndEducation.title(),
         "Exit (q)",
     ];
-    let tab_spans: Vec<Spans> = titles.iter().map(|t| Spans::from(Span::raw(*t))).collect();
+    let tab_spans: Vec<Span> = titles.iter().map(|t| Span::from(Span::raw(*t))).collect();
 
     let tabs = Tabs::new(tab_spans)
         .select(selected)

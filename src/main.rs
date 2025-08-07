@@ -1,14 +1,15 @@
+use clap::Parser;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{error::Error, io};
-use tui::{
-    backend::CrosstermBackend,
+use ratatui::{
     layout::{Constraint, Direction, Layout},
+    prelude::{Backend, CrosstermBackend},
     Frame, Terminal,
 };
+use std::{error::Error, io};
 
 use crate::{
     keymap::global_key_map,
@@ -33,15 +34,24 @@ mod settings;
 mod state;
 mod ui;
 
+#[derive(Parser, Debug)]
+#[command(name = "my-app")]
+struct Cli {
+    #[arg(short, long, default_value_t = false)]
+    local: bool,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    let cli = Cli::parse();
+
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let res = run_app(&mut terminal).await;
+    let res = run_app(&mut terminal, cli.local).await;
 
     disable_raw_mode()?;
     execute!(
@@ -58,21 +68,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn run_app<B: tui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+async fn run_app<B: Backend>(terminal: &mut Terminal<B>, local: bool) -> io::Result<()> {
     let mut state = State::default();
     let settings = Settings::default();
-    // let _ = state.load_employment_from_file();
-    // let _ = state._load_education_from_file(&settings);
-    let _ = state.load_employment_file_from_s3(&settings).await;
-    let _ = state.load_education_file_from_s3(&settings).await;
-    let settings = Settings::default();
+    let _ = state.load_files(&settings, local).await;
+
     loop {
         terminal.draw(|f| match state.is_loading {
             true => {
-                draw_loading_screen(f, &mut state);
+                draw_loading_screen::<B>(f, &mut state);
             }
             false => {
-                draw_app(f, &state);
+                draw_app::<B>(f, &state);
             }
         })?;
 
@@ -89,7 +96,7 @@ async fn run_app<B: tui::backend::Backend>(terminal: &mut Terminal<B>) -> io::Re
     Ok(())
 }
 
-fn draw_loading_screen<B: tui::backend::Backend>(f: &mut Frame<B>, state: &mut State) {
+fn draw_loading_screen<B: Backend>(f: &mut Frame, state: &mut State) {
     state.update_dot_count();
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -99,11 +106,11 @@ fn draw_loading_screen<B: tui::backend::Backend>(f: &mut Frame<B>, state: &mut S
             Constraint::Min(3),
             Constraint::Percentage(49),
         ])
-        .split(f.size());
-    render_loading_screen(f, chunks[1], &state);
+        .split(f.area());
+    render_loading_screen::<B>(f, chunks[1], &state);
 }
 
-fn draw_app<B: tui::backend::Backend>(f: &mut Frame<B>, state: &State) {
+fn draw_app<B: Backend>(f: &mut Frame, state: &State) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .margin(2)
@@ -113,16 +120,16 @@ fn draw_app<B: tui::backend::Backend>(f: &mut Frame<B>, state: &State) {
             Constraint::Min(0),
             Constraint::Length(3),
         ])
-        .split(f.size());
+        .split(f.area());
 
-    render_banner(f, chunks[0]);
-    render_tabs(f, chunks[1], state.selected_tab.index());
+    render_banner::<B>(f, chunks[0]);
+    render_tabs::<B>(f, chunks[1], state.selected_tab.index());
 
     match state.selected_tab {
-        TabsHeadings::AboutMe => render_about_me(f, chunks[2], &state),
-        TabsHeadings::ContactDetails => render_contact_details(f, chunks[2]),
-        TabsHeadings::EmploymentAndEducation => render_employment(f, chunks[2], &state),
+        TabsHeadings::AboutMe => render_about_me::<B>(f, chunks[2], &state),
+        TabsHeadings::ContactDetails => render_contact_details::<B>(f, chunks[2]),
+        TabsHeadings::EmploymentAndEducation => render_employment::<B>(f, chunks[2], &state),
     }
 
-    render_keymap(f, chunks[3], &state);
+    render_keymap::<B>(f, chunks[3], &state);
 }

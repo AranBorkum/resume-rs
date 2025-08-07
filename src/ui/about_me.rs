@@ -1,13 +1,13 @@
 use std::env;
 
-use serde::Deserialize;
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     widgets::{Block, Borders, Paragraph, Wrap},
     Frame,
 };
+use serde::Deserialize;
 
 use crate::state::State;
 
@@ -32,7 +32,7 @@ impl AboutMe {
     }
 }
 
-pub fn render_about_me<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+pub fn render_about_me<B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     let top_bottom = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Length(3), Constraint::Min(0)])

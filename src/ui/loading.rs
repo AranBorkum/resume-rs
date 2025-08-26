@@ -1,4 +1,4 @@
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Rect},
     widgets::Paragraph,
@@ -7,7 +7,7 @@ use tui::{
 
 use crate::state::State;
 
-pub fn render_loading_screen<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+pub fn render_loading_screen<B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     let text = format!(
         "Loading{}{}",
         ".".repeat(state.dot_count as usize),

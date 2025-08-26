@@ -1,13 +1,13 @@
 use std::env;
 
-use serde::Deserialize;
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     widgets::{Block, Borders, Paragraph, Wrap},
     Frame,
 };
+use serde::Deserialize;
 
 use crate::state::State;
 
@@ -32,11 +32,16 @@ impl AboutMe {
     }
 }
 
-pub fn render_about_me<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+pub fn render_about_me<B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     let top_bottom = Layout::default()
         .direction(Direction::Vertical)
         .constraints([Constraint::Length(3), Constraint::Min(0)])
         .split(chunk);
+
+    let middle = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Min(0), Constraint::Max(80), Constraint::Min(0)])
+        .split(top_bottom[1])[1];
 
     let me = match AboutMe::from_file() {
         Ok(me) => me,
@@ -64,5 +69,5 @@ pub fn render_about_me<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State)
         .block(Block::default().borders(Borders::NONE));
 
     f.render_widget(title, top_bottom[0]);
-    f.render_widget(about_me, top_bottom[1]);
+    f.render_widget(about_me, middle);
 }

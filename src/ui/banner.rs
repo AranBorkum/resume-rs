@@ -1,4 +1,4 @@
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
@@ -8,7 +8,7 @@ use tui::{
 
 use crate::assets::banner;
 
-pub fn render_banner<B: Backend>(f: &mut Frame<B>, chunk: Rect) {
+pub fn render_banner<B: Backend>(f: &mut Frame, chunk: Rect) {
     let block = Paragraph::new(banner::ASCII_ART)
         .style(
             Style::default()

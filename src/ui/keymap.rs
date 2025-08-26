@@ -1,6 +1,7 @@
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::Rect,
+    style::{Color, Style},
     text::Span,
     widgets::{Block, Borders, Paragraph},
     Frame,
@@ -11,7 +12,7 @@ use crate::{employment::EmploymentEducation, events::Event, state::State, ui::ta
 fn style_keybind(event: &Event) -> String {
     let styled_vec = vec![
         Span::raw(" <"),
-        Span::raw(event.key_binding()),
+        Span::styled(event.key_binding(), Style::default().fg(Color::Yellow)),
         Span::raw(": "),
         Span::raw(event.description()),
         Span::raw("> "),
@@ -23,7 +24,7 @@ fn style_keybind(event: &Event) -> String {
         .collect::<String>()
 }
 
-pub fn render_keymap<B: Backend>(f: &mut Frame<B>, chunk: Rect, state: &State) {
+pub fn render_keymap<B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
     let mut base_events = vec![
         Event::Quit,
         Event::SwitchToAboutMe,

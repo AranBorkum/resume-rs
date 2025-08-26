@@ -1,4 +1,4 @@
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
@@ -6,7 +6,7 @@ use tui::{
     Frame,
 };
 
-pub fn render_contact_details<B: Backend>(f: &mut Frame<B>, chunk: Rect) {
+pub fn render_contact_details<B: Backend>(f: &mut Frame, chunk: Rect) {
     let about_me = Paragraph::new("Contact information")
         .style(
             Style::default()

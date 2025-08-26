@@ -1,8 +1,8 @@
-use tui::{
+use ratatui::{
     backend::Backend,
     layout::Rect,
     style::{Color, Modifier, Style},
-    text::{Span, Spans},
+    text::Span,
     widgets::{Block, Tabs},
     Frame,
 };
@@ -12,6 +12,7 @@ pub enum TabsHeadings {
     AboutMe,
     ContactDetails,
     EmploymentAndEducation,
+    Projects,
 }
 
 impl TabsHeadings {
@@ -20,6 +21,7 @@ impl TabsHeadings {
             TabsHeadings::AboutMe => 0,
             TabsHeadings::ContactDetails => 1,
             TabsHeadings::EmploymentAndEducation => 2,
+            TabsHeadings::Projects => 3,
         }
     }
 
@@ -28,18 +30,20 @@ impl TabsHeadings {
             TabsHeadings::AboutMe => "About Me (a)",
             TabsHeadings::ContactDetails => "Contact Details (c)",
             TabsHeadings::EmploymentAndEducation => "Employment and Education (e)",
+            TabsHeadings::Projects => "Projects (p)",
         }
     }
 }
 
-pub fn render_tabs<B: Backend>(f: &mut Frame<B>, chunk: Rect, selected: usize) {
+pub fn render_tabs<B: Backend>(f: &mut Frame, chunk: Rect, selected: usize) {
     let titles = [
         TabsHeadings::AboutMe.title(),
         TabsHeadings::ContactDetails.title(),
         TabsHeadings::EmploymentAndEducation.title(),
+        TabsHeadings::Projects.title(),
         "Exit (q)",
     ];
-    let tab_spans: Vec<Spans> = titles.iter().map(|t| Spans::from(Span::raw(*t))).collect();
+    let tab_spans: Vec<Span> = titles.iter().map(|t| Span::from(Span::raw(*t))).collect();
 
     let tabs = Tabs::new(tab_spans)
         .select(selected)

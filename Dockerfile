@@ -1,9 +1,10 @@
 # Build stage
-FROM rust:1.78 AS builder
+FROM rust:1.88 AS builder
 
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
+COPY data ./data
 
 RUN cargo build --release
 RUN strip target/release/app
@@ -17,6 +18,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 COPY --from=builder /app/target/release/app .
+COPY --from=builder /app/data ./data
 
-ENTRYPOINT ["./app"]
+ENTRYPOINT ["./app", "--local"]
 

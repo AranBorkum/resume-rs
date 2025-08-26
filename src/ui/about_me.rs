@@ -38,6 +38,11 @@ pub fn render_about_me<B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
         .constraints([Constraint::Length(3), Constraint::Min(0)])
         .split(chunk);
 
+    let middle = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([Constraint::Min(0), Constraint::Max(80), Constraint::Min(0)])
+        .split(top_bottom[1])[1];
+
     let me = match AboutMe::from_file() {
         Ok(me) => me,
         Err(_) => AboutMe::default(),
@@ -64,5 +69,5 @@ pub fn render_about_me<B: Backend>(f: &mut Frame, chunk: Rect, state: &State) {
         .block(Block::default().borders(Borders::NONE));
 
     f.render_widget(title, top_bottom[0]);
-    f.render_widget(about_me, top_bottom[1]);
+    f.render_widget(about_me, middle);
 }

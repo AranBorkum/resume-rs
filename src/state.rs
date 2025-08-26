@@ -76,17 +76,9 @@ impl State {
         }
     }
 
-    pub async fn load_files(&mut self, settings: &Settings, local: bool) {
-        match local {
-            true => {
-                let _ = self.load_employment_from_file();
-                let _ = self.load_education_from_file();
-            }
-            false => {
-                let _ = self.load_employment_file_from_s3(&settings).await;
-                let _ = self.load_education_file_from_s3(&settings).await;
-            }
-        }
+    pub async fn load_files(&mut self, settings: &Settings) {
+        let _ = self.load_employment_from_file();
+        let _ = self.load_education_from_file();
     }
 
     fn load_employment_from_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {

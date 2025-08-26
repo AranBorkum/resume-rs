@@ -34,24 +34,15 @@ mod settings;
 mod state;
 mod ui;
 
-#[derive(Parser, Debug)]
-#[command(name = "my-app")]
-struct Cli {
-    #[arg(short, long, default_value_t = false)]
-    local: bool,
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let cli = Cli::parse();
-
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let res = run_app(&mut terminal, cli.local).await;
+    let res = run_app(&mut terminal).await;
 
     disable_raw_mode()?;
     execute!(
@@ -68,10 +59,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn run_app<B: Backend>(terminal: &mut Terminal<B>, local: bool) -> io::Result<()> {
+async fn run_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
     let mut state = State::default();
     let settings = Settings::default();
-    let _ = state.load_files(&settings, local).await;
+    let _ = state.load_files(&settings).await;
 
     loop {
         terminal.draw(|f| match state.is_loading {
@@ -129,6 +120,7 @@ fn draw_app<B: Backend>(f: &mut Frame, state: &State) {
         TabsHeadings::AboutMe => render_about_me::<B>(f, chunks[2], &state),
         TabsHeadings::ContactDetails => render_contact_details::<B>(f, chunks[2]),
         TabsHeadings::EmploymentAndEducation => render_employment::<B>(f, chunks[2], &state),
+        TabsHeadings::Projects => {}
     }
 
     render_keymap::<B>(f, chunks[3], &state);
